@@ -1,30 +1,39 @@
-import argparse
-import sys
-
+from pyspark.sql import SparkSession
+from utils import get_dataset_path
 from group_runner import GroupRunner
 from naive_runner import NaiveRunner
 
 
 def main ():
+    spark = SparkSession.builder.appName("MovieSimilarity").getOrCreate()
+
+    movies_ratings_data = spark.read.csv(str(get_dataset_path('movies-ratings.csv')), header=True)
+    movies_ratings_data.show()
+
+    spark.stop()
+
+
+    # TODO: Uncomment this when implementation is ready to execute from command line
     # In case a user execute main file with --help flag
-    parser = argparse.ArgumentParser(description="Run Spark job with 'naive' or 'group' argument")
-    parser.add_argument("mode", nargs=1, help="Execution mode: naive or group Map Reduce implementation")
-
-    args = parser.parse_args()
-
-    if args.mode[0] == "naive":
-        naive_runner = NaiveRunner()
-        naive_runner.run()
-    elif args.mode[0] == "group":
-        group_runner = GroupRunner()
-        group_runner.run()
-    else:
-        print(f"Error: Invalid argument '{args.mode[0]}'. Use 'naive' or 'group'.")
-        sys.exit(1)
+    # parser = argparse.ArgumentParser(description="Run Spark job with 'naive' or 'group' argument")
+    # parser.add_argument("mode", nargs=1, help="Execution mode: naive or group Map Reduce implementation")
+    #
+    # args = parser.parse_args()
+    #
+    # if args.mode[0] == "naive":
+    #     naive_runner = NaiveRunner()
+    #     naive_runner.run()
+    # elif args.mode[0] == "group":
+    #     group_runner = GroupRunner()
+    #     group_runner.run()
+    # else:
+    #     print(f"Error: Invalid argument '{args.mode[0]}'. Use 'naive' or 'group'.")
+    #     sys.exit(1)
 
 if __name__ == "__main__":
+    # TODO: Uncomment this when implementation is ready to execute from command line
     # Ensure no extra args are passed
-    if len(sys.argv) != 2:
-        print("Error: Exactly one argument required: 'naive' or 'group'.")
-        sys.exit(1)
+    # if len(sys.argv) != 2:
+    #     print("Error: Exactly one argument required: 'naive' or 'group'.")
+    #     sys.exit(1)
     main()
