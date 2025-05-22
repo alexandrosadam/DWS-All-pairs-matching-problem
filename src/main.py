@@ -1,17 +1,16 @@
-from pyspark.sql import SparkSession
-from utils import get_dataset_path
-from group_runner import GroupRunner
 from naive_runner import NaiveRunner
-
+import time
 
 def main ():
-    spark = SparkSession.builder.appName("MovieSimilarity").getOrCreate()
+    start_time = time.time()
+    NaiveRunner.execute_naive_all_pairs_matching()
+    print(f"Naive approach completed in {time.time() - start_time:.2f} seconds")
 
-    movies_ratings_data = spark.read.csv(str(get_dataset_path('movies-ratings.csv')), header=True)
-    movies_ratings_data.show()
-
-    spark.stop()
-
+    # TODO: Uncomment this when implementation is ready to execute from command line
+    # Ensure no extra args are passed
+    # if len(sys.argv) != 2:
+    #     print("Error: Exactly one argument required: 'naive' or 'group'.")
+    #     sys.exit(1)
 
     # TODO: Uncomment this when implementation is ready to execute from command line
     # In case a user execute main file with --help flag
@@ -31,9 +30,5 @@ def main ():
     #     sys.exit(1)
 
 if __name__ == "__main__":
-    # TODO: Uncomment this when implementation is ready to execute from command line
-    # Ensure no extra args are passed
-    # if len(sys.argv) != 2:
-    #     print("Error: Exactly one argument required: 'naive' or 'group'.")
-    #     sys.exit(1)
     main()
+
