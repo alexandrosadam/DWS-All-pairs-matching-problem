@@ -1,7 +1,37 @@
+import os
+
+from pyspark.sql import SparkSession
+from utils import get_dataset_path, calculate_group_similarity, save_similarities
+from pyspark.rdd import RDD
+from typing import List, Set, Tuple
+
+
 class GroupRunner:
     @classmethod
-    def execute_group_all_pairs_matching(cls):
-        # spark = SparkSession.builder.appName("GroupTask").getOrCreate()
-        print("Running group Spark job...")
-        # Add your group implementation here
-        # spark.stop()
+    def execute_group_all_pairs_matching(cls, group_size: int = 50):
+        spark: SparkSession = SparkSession.builder.appName("GroupAllPairsMatching").getOrCreate()
+
+        try:
+            # Spark driver reads the csv file and outputs a distributed DataFrame across worker nodes
+            movies_ratings_data = spark.read.csv(str(get_dataset_path()), header=True)
+
+            # Convert data to RDD, generate key - value pairs and merge sets (like in naive approach)
+            user_movies: RDD[Tuple[str, Set[str]]] = movies_ratings_data.rdd \
+                .map(lambda row: (row['userId'], {row['movieId']})) \
+                .reduceByKey(lambda a, b: a | b)
+
+            # Group users into batches
+            grouped_users: RDD[List[Tuple[str, Set[str]]]] = user_movies \
+                .zipWithIndex() \
+                .map(lambda x: (x[1] // group_size, x[0])) \
+                .groupByKey() \
+                .map(lambda x: list(x[1]))
+
+            # Compute intra-group similarities
+            similarities: RDD[Tuple[str, str, float]] = grouped_users.flatMap(calculate_group_similarity)
+
+            # Save results: (user1, user2, similarity_score) into a csv file
+            save_similarities(similarities, "group_user_similarities")
+
+        finally:
+            spark.stop()

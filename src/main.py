@@ -5,8 +5,8 @@ import sys
 from naive_runner import NaiveRunner
 from group_runner import GroupRunner
 
-def main ():
 
+def main():
     if len(sys.argv) != 2:  # Ensure no extra args are passed
         print("Error: Exactly one argument required: 'naive' or 'group'.")
         sys.exit(1)
@@ -28,6 +28,6 @@ def main ():
         print(f"Error: Invalid argument '{args.mode[0]}'. Use 'naive' or 'group'.")
         sys.exit(1)
 
+
 if __name__ == "__main__":
     main()
-
