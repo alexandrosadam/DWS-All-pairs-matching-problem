@@ -1,0 +1,45 @@
+version: '3'
+
+services:
+  spark-master:
+    build: ./spark
+    container_name: spark-master
+    hostname: spark-master
+    environment:
+      - SPARK_MODE=master
+    ports:
+      - "8080:8080"  # Spark master UI
+      - "7077:7077"  # Spark master port
+    networks:
+      - spark-network
+
+  spark-worker-1:
+    build: ./spark
+    container_name: spark-worker-1
+    hostname: spark-worker-1
+    environment:
+      - SPARK_MODE=worker
+      - SPARK_MASTER_URL=spark://spark-master:7077
+    networks:
+      - spark-network
+
+  spark-worker-2:
+    build: ./spark
+    container_name: spark-worker-2
+    hostname: spark-worker-2
+    environment:
+      - SPARK_MODE=worker
+      - SPARK_MASTER_URL=spark://spark-master:7077
+    networks:
+      - spark-network
+
+  spark-app:
+    build: ./src
+    depends_on:
+      - spark-master
+    networks:
+      - spark-network
+    command: ["spark-submit", "--master", "spark://spark-master:7077", "main.py"]
+
+networks:
+  spark-network:
