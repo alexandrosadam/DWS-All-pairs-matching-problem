@@ -1,5 +1,6 @@
 import os
 
+from pyspark import SparkFiles
 from pyspark.sql import SparkSession
 from utils import get_dataset_path, calculate_group_similarity, save_similarities
 from pyspark.rdd import RDD
@@ -9,11 +10,15 @@ from typing import List, Set, Tuple
 class GroupRunner:
     @classmethod
     def execute_group_all_pairs_matching(cls, group_size: int = 50):
-        spark: SparkSession = SparkSession.builder.appName("GroupAllPairsMatching").getOrCreate()
+        spark: SparkSession = SparkSession.builder \
+                                .master("local[*]")  \
+                                .appName("GroupAllPairsMatching") \
+                                .getOrCreate()
 
         try:
             # Spark driver reads the csv file and outputs a distributed DataFrame across worker nodes
-            movies_ratings_data = spark.read.csv(str(get_dataset_path()), header=True)
+            spark.sparkContext.addFile(str(get_dataset_path()))
+            movies_ratings_data = spark.read.csv(f"file://{SparkFiles.get("movies-ratings.csv")}", header=True)
 
             # Convert data to RDD, generate key - value pairs and merge sets (like in naive approach)
             user_movies: RDD[Tuple[str, Set[str]]] = movies_ratings_data.rdd \

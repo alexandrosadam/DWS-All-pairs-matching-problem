@@ -20,6 +20,8 @@ services:
     environment:
       - SPARK_MODE=worker
       - SPARK_MASTER_URL=spark://spark-master:7077
+    volumes:
+      - ./datasets:/datasets:ro
     networks:
       - spark-network
 
@@ -30,6 +32,8 @@ services:
     environment:
       - SPARK_MODE=worker
       - SPARK_MASTER_URL=spark://spark-master:7077
+    volumes:
+      - ./datasets:/datasets:ro
     networks:
       - spark-network
 
@@ -39,7 +43,11 @@ services:
       - spark-master
     networks:
       - spark-network
-    command: ["spark-submit", "--master", "spark://spark-master:7077", "main.py"]
+    volumes:
+      - ./src:/app
+      - ./datasets:/datasets
+      - ./output:/output
+    command:  ["sh", "-c", "spark-submit --master spark://spark-master:7077 /app/main.py $MODE"]
 
 networks:
   spark-network:
