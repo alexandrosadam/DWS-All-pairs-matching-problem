@@ -2,23 +2,26 @@ from pathlib import Path
 
 from pyspark import SparkFiles
 from pyspark.sql import SparkSession
-from utils import get_dataset_path, save_similarities, calculate_user_similarity
+from utils import get_dataset_path, save_similarities, calculate_user_similarity, get_dataset_size_limit
 from pyspark.rdd import RDD
 from typing import Dict, Set, Tuple
 
 
 class NaiveRunner:
     @classmethod
-    def execute_naive_all_pairs_matching(cls):
+    def execute_naive_all_pairs_matching(cls, dataset_size: str):
         spark: SparkSession = SparkSession.builder \
-                                .master("local[*]") \
-                                .appName("GroupAllPairsMatching") \
-                                .getOrCreate()
+            .master("local[*]") \
+            .appName("GroupAllPairsMatching") \
+            .getOrCreate()
 
         try:
             # Spark driver reads the csv file and outputs a distributed DataFrame across worker nodes
             spark.sparkContext.addFile(str(get_dataset_path()))
-            movies_ratings_data = spark.read.csv(f"file://{SparkFiles.get("movies-ratings.csv")}", header=True)
+            movies_ratings_data = spark.read.csv(f"file://{SparkFiles.get("movies-ratings.csv")}", header=True).limit(
+                get_dataset_size_limit(dataset_size))
+
+            movies_ratings_data = movies_ratings_data.repartition(4)
 
             """
                 In the below pipeline:

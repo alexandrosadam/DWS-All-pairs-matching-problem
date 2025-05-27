@@ -47,7 +47,7 @@ services:
       - ./src:/app
       - ./datasets:/datasets
       - ./output:/output
-    command:  ["sh", "-c", "spark-submit --master spark://spark-master:7077 /app/main.py $MODE"]
+    command:  ["sh", "-c", "spark-submit --master spark://spark-master:7077 /app/main.py $MODE $DATASET_SIZE"]
 
 networks:
   spark-network:

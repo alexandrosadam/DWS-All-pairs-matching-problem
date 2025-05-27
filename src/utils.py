@@ -5,8 +5,13 @@ import itertools
 
 from typing import Iterable, Set, Tuple, List, Hashable
 from pathlib import Path
+
 from pyspark.rdd import RDD
 from pyspark import Broadcast
+
+SMALL_DATASET_SIZE_LIMIT = 100000
+MEDIUM_DATASET_SIZE_LIMIT = 250000
+LARGE_DATASET_SIZE_LIMIT = 500000
 
 
 def get_project_root_path():
@@ -17,6 +22,14 @@ def get_project_root_path():
 def get_dataset_path():
     """Returns absolute path to dataset file"""
     return get_project_root_path() / "datasets" / "movies-ratings.csv"
+
+
+def get_dataset_size_limit(dataset_size: str) -> int:
+    if dataset_size == 'small': return SMALL_DATASET_SIZE_LIMIT
+
+    if dataset_size == 'medium': return MEDIUM_DATASET_SIZE_LIMIT
+
+    return LARGE_DATASET_SIZE_LIMIT
 
 
 def calculate_user_similarity(pair: Tuple[str, str], broadcast_user_movies: Broadcast[dict[Hashable, set]]) -> Tuple[
