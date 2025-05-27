@@ -20,12 +20,12 @@ def main():
 
     if args.mode[0] == "naive":
         NaiveRunner.execute_naive_all_pairs_matching()
-        print(f"Naive approach completed in {time.time() - start_time:.2f} seconds")
+        print(f"Naive approach completed in {time.time() - start_time:.2f} seconds", flush=True)
     elif args.mode[0] == "group":
         GroupRunner().execute_group_all_pairs_matching()
-        print(f"Group approach completed in {time.time() - start_time:.2f} seconds")
+        print(f"Group approach completed in {time.time() - start_time:.2f} seconds", flush=True)
     else:
-        print(f"Error: Invalid argument '{args.mode[0]}'. Use 'naive' or 'group'.")
+        print(f"Error: Invalid argument '{args.mode[0]}'. Use 'naive' or 'group'.", flush=True)
         sys.exit(1)
 
 

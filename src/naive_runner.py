@@ -1,3 +1,6 @@
+from pathlib import Path
+
+from pyspark import SparkFiles
 from pyspark.sql import SparkSession
 from utils import get_dataset_path, save_similarities, calculate_user_similarity
 from pyspark.rdd import RDD
@@ -7,11 +10,15 @@ from typing import Dict, Set, Tuple
 class NaiveRunner:
     @classmethod
     def execute_naive_all_pairs_matching(cls):
-        spark: SparkSession = SparkSession.builder.appName("NaiveAllPairsMatching").getOrCreate()
+        spark: SparkSession = SparkSession.builder \
+                                .master("local[*]") \
+                                .appName("GroupAllPairsMatching") \
+                                .getOrCreate()
 
         try:
             # Spark driver reads the csv file and outputs a distributed DataFrame across worker nodes
-            movies_ratings_data = spark.read.csv(str(get_dataset_path()), header=True)
+            spark.sparkContext.addFile(str(get_dataset_path()))
+            movies_ratings_data = spark.read.csv(f"file://{SparkFiles.get("movies-ratings.csv")}", header=True)
 
             """
                 In the below pipeline:
