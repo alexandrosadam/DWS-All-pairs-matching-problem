@@ -6,7 +6,19 @@ The application runs inside a Dockerized Spark cluster, allowing controlled benc
 
 ---
 
-## 📄 Description
+## Table of Contents
+
+1. [About the Project](#about-the-project)
+2. [Tech Stack](#tech-stack)
+3. [Features](#features)
+4. [Getting Started](#getting-started)
+   - [Prerequisites](#prerequisites)
+   - [Installation](#installation)
+   - [Running the Project](#running-the-project)
+
+---
+
+## 📄 About the project
 
 - What problem does this project solve?
 - What approaches are implemented?
